@@ -1,8 +1,8 @@
 <template>
   <div class="main">
     <Table
-      :fields="fields"
-      :per-page="perPage"
+      :table-fields="fields"
+      :rows-per-page="perPage"
       :total-rows="count"
       :table-data="products"
       :is-api-driven="true"
@@ -10,7 +10,6 @@
       @filter-data="handleTableChange"
       @sort-data="handleTableChange"
       @page-change="handleTableChange"
-      @cell-button-click="handleClick"
     />
   </div>
 </template>
@@ -48,18 +47,6 @@ export default {
       this.isLoading = true
       await this.$store.dispatch('products/getProducts', { page, sortBy, isDescending, filterOn, filterValue })
       this.isLoading = false
-    },
-    // обработчик для клика по кнопке в таблице
-    handleClick (e) {
-      const classes = e.target.classList
-      const isRed = e.target.classList.contains('btn-danger')
-      if (isRed) {
-        classes.remove('btn-danger')
-        classes.add('btn-primary')
-      } else {
-        classes.remove('btn-primary')
-        classes.add('btn-danger')
-      }
     }
   }
 }

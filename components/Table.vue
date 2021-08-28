@@ -26,7 +26,7 @@
               v-model="filter"
               type="search"
               placeholder="Type to Search"
-              v-on="isApiDriven ? {input: handleFilter} : {}"
+              v-on="hasApi ? {input: handleFilter} : {}"
             />
 
             <b-input-group-append />
@@ -63,10 +63,10 @@
       >
         <b-pagination
           v-model="currentPage"
-          :total-rows="totalRows"
+          :total-rows="total"
           :per-page="perPage"
           aria-controls="my-table"
-          v-on="isApiDriven ? {input: handlePaginationInput} : {}"
+          v-on="hasApi ? {input: handlePaginationInput} : {}"
         />
 
         <p class="mt-1">
@@ -80,42 +80,42 @@
       sticky-header="75vh"
       outlined
       hover
-      :busy="isLoading"
-      :filter-included-fields="isApiDriven ? null : [filterOn] "
-      :filter="isApiDriven ? null : filter"
+      :busy="isBusy"
+      :filter-included-fields="hasApi ? null : [filterOn] "
+      :filter="hasApi ? null : filter"
       :fields="fields"
-      :per-page="isApiDriven ? null : perPage"
+      :per-page="hasApi ? null : perPage"
       :sort-by.sync="sortBy"
       :sort-desc.sync="sortDesc"
-      :items="tableData"
+      :items="data"
       :current-page="currentPage"
-      :no-local-sorting="isApiDriven"
-      v-on="isApiDriven ? {'sort-changed': handleSorting} : {}"
+      :no-local-sorting="hasApi"
+      v-on="hasApi ? {'sort-changed': handleSorting} : {}"
     >
-      <template #cell()="data">
+      <template #cell()="cell">
         <img
-          v-if="data.field.type === 'image'"
-          :src="data.value"
+          v-if="cell.field.type === 'image'"
+          :src="cell.value"
         >
         <a
-          v-else-if="data.field.type === 'link'"
-          :href="data.value"
+          v-else-if="cell.field.type === 'link'"
+          :href="cell.value"
         >
-          {{ data.value }}
+          {{ cell.value }}
         </a>
         <button
-          v-else-if="data.field.type === 'button'"
-          :key="'' + currentPage + data.index"
+          v-else-if="cell.field.type === 'button'"
+          :key="'' + currentPage + cell.index"
           class="btn btn-primary"
-          v-on="data.field.callback ? {'click': handleCellButtonClick} : {}"
+          v-on="cell.field.callback ? {'click': handleCellButtonClick} : {}"
         >
-          {{ data.field.key }}
+          {{ cell.field.key }}
         </button>
-        <span v-else-if="data.field.type === 'date'">
-          {{ formatDate(data.value) }}
+        <span v-else-if="cell.field.type === 'date'">
+          {{ formatDate(cell.value) }}
         </span>
         <span v-else>
-          {{ data.value }}
+          {{ cell.value }}
         </span>
       </template>
     </b-table>
@@ -130,11 +130,11 @@ export default {
       type: Array,
       required: true
     },
-    fields: {
+    tableFields: {
       type: Array,
       required: true
     },
-    perPage: {
+    rowsPerPage: {
       type: Number,
       default: null
     },
@@ -154,11 +154,32 @@ export default {
   data () {
     return {
       currentPage: 1,
-      sortBy: this.fields.find(item => item.sortable).key,
+      sortBy: this.tableFields.find(item => item.sortable).key,
       sortDesc: false,
       filter: '',
-      filterOn: this.fields.find(item => item.filterable).key,
-      hasPagination: !!this.perPage
+      filterOn: this.tableFields.find(item => item.filterable).key,
+      hasPagination: !!this.rowsPerPage
+    }
+  },
+
+  computed: {
+    data () {
+      return this.tableData
+    },
+    fields () {
+      return this.tableFields
+    },
+    perPage () {
+      return this.rowsPerPage
+    },
+    total () {
+      return this.totalRows
+    },
+    hasApi () {
+      return this.isApiDriven
+    },
+    isBusy () {
+      return this.isLoading
     }
   },
 
