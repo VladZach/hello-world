@@ -1,9 +1,9 @@
 <template>
   <div class="main">
     <Table
-      :fields="fields"
+      :table-fields="fields"
       :table-data="products"
-      :per-page="5"
+      :rows-per-page="5"
       :total-rows="products.length"
     />
   </div>

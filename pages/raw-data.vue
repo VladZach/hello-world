@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <Table
-      :fields="fields"
+      :table-fields="fields"
       :table-data="products"
     />
   </div>
